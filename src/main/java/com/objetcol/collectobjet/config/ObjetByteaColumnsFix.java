@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -16,9 +17,13 @@ import java.sql.Statement;
 /**
  * Si la base a été créée avec titre/description en BYTEA (ancien schéma), PostgreSQL
  * ne peut pas appliquer {@code LOWER()} dans les requêtes JPA — correction unique au démarrage.
+ *
+ * Cette task est sensible (ouvre une connexion et modifie le schéma). Elle est donc
+ * désactivée par défaut en production ; activez-la avec `APP_FIX_BYTEA_ENABLED=true`.
  */
 @Component
 @Order(0)
+@ConditionalOnProperty(prefix = "app.fix-bytea", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class ObjetByteaColumnsFix implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(ObjetByteaColumnsFix.class);
@@ -51,7 +56,7 @@ public class ObjetByteaColumnsFix implements ApplicationRunner {
                 column, sqlType, column);
         try (Statement st = c.createStatement()) {
             st.execute(sql);
-            log.warn("Schéma corrigé : colonne objets.{} était BYTEA, convertie en {}.", column, sqlType);
+            log.warn("Schéma corrigé : colonne objets.%s était BYTEA, convertie en %s.", column, sqlType);
         }
     }
 

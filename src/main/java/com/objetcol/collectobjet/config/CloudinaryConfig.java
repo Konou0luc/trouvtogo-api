@@ -3,10 +3,15 @@ package com.objetcol.collectobjet.config;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Cloudinary bean is created only when `cloudinary.api-key` is provided.
+ */
 @Configuration
+@ConditionalOnProperty(prefix = "cloudinary", name = "api-key", matchIfMissing = false)
 public class CloudinaryConfig {
 
     @Bean
