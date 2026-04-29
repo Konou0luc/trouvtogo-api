@@ -145,7 +145,13 @@ public class ObjetService {
         Objet objet = objetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Objet", id));
 
-        if (!objet.getProprietaire().getEmail().equals(email)) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
+
+        boolean isAdmin = user.getRole() == Role.ROLE_ADMIN;
+        boolean isOwner = objet.getProprietaire().getEmail().equals(email);
+
+        if (!isAdmin && !isOwner) {
             throw new UnauthorizedException("Vous n'êtes pas autorisé à modifier le statut de cet objet");
         }
 
