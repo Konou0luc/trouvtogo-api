@@ -2,14 +2,17 @@ package com.objetcol.collectobjet.controller;
 
 import com.objetcol.collectobjet.dto.response.ApiResponse;
 import com.objetcol.collectobjet.dto.response.CommunauteStatsResponse;
+import com.objetcol.collectobjet.dto.response.TimeSeriesPointResponse;
 import com.objetcol.collectobjet.service.StatsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/stats")
@@ -24,5 +27,12 @@ public class StatsController {
     public ResponseEntity<ApiResponse<CommunauteStatsResponse>> communaute() {
         return ResponseEntity.ok(
                 ApiResponse.success("Statistiques communauté", statsService.getCommunauteStats()));
+    }
+
+    @GetMapping("/timeseries")
+    @Operation(summary = "Séries temporelles des objets (perdu/trouvé/résolu)")
+    public ResponseEntity<ApiResponse<List<TimeSeriesPointResponse>>> timeseries(
+            @RequestParam(value = "months", defaultValue = "6") int months) {
+        return ResponseEntity.ok(ApiResponse.success("Timeseries", statsService.getTimeSeries(months)));
     }
 }
