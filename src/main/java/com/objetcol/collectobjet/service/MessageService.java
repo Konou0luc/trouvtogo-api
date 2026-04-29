@@ -76,6 +76,75 @@ public class MessageService {
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    public List<com.objetcol.collectobjet.dto.response.ConversationResponse> getConversations(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
+
+        List<Message> received = messageRepository.findByDestinataireIdOrderByCreatedAtDesc(user.getId());
+        List<Message> sent = messageRepository.findByExpediteurIdOrderByCreatedAtDesc(user.getId());
+
+        // aggregate by partner user id
+        java.util.Map<Long, java.util.List<Message>> byPartner = new java.util.HashMap<>();
+
+        for (Message m : received) {
+            Long partner = m.getExpediteur().getId();
+            byPartner.computeIfAbsent(partner, k -> new java.util.ArrayList<>()).add(m);
+        }
+        for (Message m : sent) {
+            Long partner = m.getDestinataire().getId();
+            byPartner.computeIfAbsent(partner, k -> new java.util.ArrayList<>()).add(m);
+        }
+
+        java.util.List<com.objetcol.collectobjet.dto.response.ConversationResponse> out = new java.util.ArrayList<>();
+
+        for (java.util.Map.Entry<Long, java.util.List<Message>> e : byPartner.entrySet()) {
+            Long otherUserId = e.getKey();
+            java.util.List<Message> list = e.getValue();
+
+            // find last message
+            Message last = list.stream().max(java.util.Comparator.comparing(Message::getCreatedAt)).orElse(null);
+            if (last == null) continue;
+
+            int unread = (int) list.stream().filter(m -> !m.isLu() && m.getDestinataire().getId().equals(user.getId())).count();
+
+            com.objetcol.collectobjet.dto.response.ConversationResponse.LastMessageResponse lastMsg =
+                    com.objetcol.collectobjet.dto.response.ConversationResponse.LastMessageResponse.builder()
+                            .content(last.getContenu())
+                            .createdAt(last.getCreatedAt())
+                            .isFromMe(last.getExpediteur().getId().equals(user.getId()))
+                            .build();
+
+            com.objetcol.collectobjet.dto.response.ConversationResponse.UserPublicResponse otherUser =
+                    com.objetcol.collectobjet.dto.response.ConversationResponse.UserPublicResponse.builder()
+                            .id(otherUserId)
+                            .name(list.get(0).getExpediteur().getId().equals(otherUserId) ? list.get(0).getExpediteur().getUsername() : list.get(0).getDestinataire().getUsername())
+                            .avatarUrl(null)
+                            .build();
+
+            com.objetcol.collectobjet.dto.response.ConversationResponse conv =
+                    com.objetcol.collectobjet.dto.response.ConversationResponse.builder()
+                            .id(otherUserId)
+                            .otherUserId(otherUserId)
+                            .otherUser(otherUser)
+                            .itemId(last.getObjet() != null ? last.getObjet().getId() : null)
+                            .item(last.getObjet() != null ? com.objetcol.collectobjet.dto.response.ObjetResponse.builder()
+                                    .id(last.getObjet().getId())
+                                    .titre(last.getObjet().getTitre())
+                                    .build() : null)
+                            .lastMessage(lastMsg)
+                            .unreadCount(unread)
+                            .matchScore(0)
+                            .updatedAt(last.getCreatedAt())
+                            .build();
+
+            out.add(conv);
+        }
+
+        // sort by updatedAt desc
+        out.sort((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()));
+        return out;
+    }
+
     @Transactional
     public void marquerCommeLu(Long messageId, String email) {
         Message message = messageRepository.findById(messageId)
