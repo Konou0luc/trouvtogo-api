@@ -20,5 +20,4 @@ public class LieuDepotResponse {
     private String telephone;
     private String indication;
     private boolean actif;
-    private Integer ordreAffichage;
 }

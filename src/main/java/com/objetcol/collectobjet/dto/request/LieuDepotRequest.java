@@ -36,7 +36,4 @@ public class LieuDepotRequest {
 
     /** Si absent en JSON, traité comme {@code true} côté service. */
     private Boolean actif;
-
-    /** Si absent, traité comme {@code 0} côté service. */
-    private Integer ordreAffichage;
 }

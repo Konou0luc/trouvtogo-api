@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,13 +22,13 @@ public class LieuDepotService {
     private final ObjetRepository objetRepository;
 
     public List<LieuDepotResponse> listerActifsPublic() {
-        return lieuDepotRepository.findByActifTrueOrderByOrdreAffichageAscNomAsc().stream()
+        return lieuDepotRepository.findByActifTrueOrderByNomAsc().stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
     public List<LieuDepotResponse> listerTousAdmin() {
-        return lieuDepotRepository.findAll(Sort.by(Sort.Order.asc("ordreAffichage"), Sort.Order.asc("nom"))).stream()
+        return lieuDepotRepository.findAll(Sort.by(Sort.Order.asc("nom"))).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
@@ -54,7 +53,6 @@ public class LieuDepotService {
                 .telephone(blankToNull(request.getTelephone()))
                 .indication(blankToNull(request.getIndication()))
                 .actif(Boolean.TRUE.equals(request.getActif()) || request.getActif() == null)
-                .ordreAffichage(Objects.requireNonNullElse(request.getOrdreAffichage(), 0))
                 .build();
         return toResponse(lieuDepotRepository.save(lieu));
     }
@@ -78,7 +76,6 @@ public class LieuDepotService {
         if (request.getActif() != null) {
             lieu.setActif(request.getActif());
         }
-        lieu.setOrdreAffichage(Objects.requireNonNullElse(request.getOrdreAffichage(), lieu.getOrdreAffichage()));
 
         return toResponse(lieuDepotRepository.save(lieu));
     }
@@ -112,7 +109,6 @@ public class LieuDepotService {
                 .telephone(l.getTelephone())
                 .indication(l.getIndication())
                 .actif(l.isActif())
-                .ordreAffichage(l.getOrdreAffichage())
                 .build();
     }
 }

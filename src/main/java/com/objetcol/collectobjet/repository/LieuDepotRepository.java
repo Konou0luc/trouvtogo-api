@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface LieuDepotRepository extends JpaRepository<LieuDepot, Long> {
 
-    List<LieuDepot> findByActifTrueOrderByOrdreAffichageAscNomAsc();
+    List<LieuDepot> findByActifTrueOrderByNomAsc();
 
     boolean existsByNomAndIdNot(String nom, Long id);
 
