@@ -28,7 +28,7 @@ public class ObjetService {
 
     @Transactional
     public ObjetResponse creerObjet(ObjetRequest request, String email) {
-        User proprietaire = userRepository.findByEmail(email)
+        User proprietaire = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
 
         Categorie categorie = null;
@@ -127,7 +127,7 @@ public class ObjetService {
         Objet objet = objetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Objet", id));
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
 
         boolean isAdmin = user.getRole() == Role.ROLE_ADMIN;
@@ -145,7 +145,7 @@ public class ObjetService {
         Objet objet = objetRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Objet", id));
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
 
         boolean isAdmin = user.getRole() == Role.ROLE_ADMIN;
@@ -160,7 +160,7 @@ public class ObjetService {
     }
 
     public List<ObjetResponse> getMesObjets(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
         return objetRepository.findByProprietaireId(user.getId())
                 .stream().map(this::toResponse).collect(Collectors.toList());

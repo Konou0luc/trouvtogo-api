@@ -27,7 +27,7 @@ public class MessageService {
 
     @Transactional
     public MessageResponse envoyerMessage(MessageRequest request, String emailExpediteur) {
-        User expediteur = userRepository.findByEmail(emailExpediteur)
+        User expediteur = userRepository.findByEmailIgnoreCase(emailExpediteur)
                 .orElseThrow(() -> new ResourceNotFoundException("Expéditeur introuvable"));
 
         // ✅ Corrigé : getDestinataireId() avec I majuscule
@@ -56,28 +56,28 @@ public class MessageService {
     }
 
     public List<MessageResponse> getMessagesRecus(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
         return messageRepository.findByDestinataireIdOrderByCreatedAtDesc(user.getId())
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     public List<MessageResponse> getMessagesEnvoyes(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
         return messageRepository.findByExpediteurIdOrderByCreatedAtDesc(user.getId())
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     public List<MessageResponse> getConversation(Long autreUserId, String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
         return messageRepository.findConversation(user.getId(), autreUserId)
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     public List<com.objetcol.collectobjet.dto.response.ConversationResponse> getConversations(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
 
         List<Message> received = messageRepository.findByDestinataireIdOrderByCreatedAtDesc(user.getId());
@@ -159,7 +159,7 @@ public class MessageService {
     }
 
     public long getNombreMessagesNonLus(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
         return messageRepository.countByDestinataireIdAndLuFalse(user.getId());
     }

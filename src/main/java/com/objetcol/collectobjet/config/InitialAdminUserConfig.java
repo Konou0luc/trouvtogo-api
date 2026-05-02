@@ -20,7 +20,7 @@ public class InitialAdminUserConfig {
             String username = System.getenv().getOrDefault("INIT_ADMIN_USERNAME", "Admin");
             String rawPassword = System.getenv().getOrDefault("INIT_ADMIN_PASSWORD", "luc12345!");
 
-            if (!userRepository.existsByEmail(email) && !userRepository.existsByUsername(username)) {
+            if (!userRepository.existsByEmailIgnoreCase(email) && !userRepository.existsByUsername(username)) {
                 User admin = User.builder()
                         .username(username)
                         .email(email)

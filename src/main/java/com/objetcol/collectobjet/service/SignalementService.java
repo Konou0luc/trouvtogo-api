@@ -30,7 +30,7 @@ public class SignalementService {
         Objet objet = objetRepository.findById(objetId)
                 .orElseThrow(() -> new ResourceNotFoundException("Objet", objetId));
 
-        User reporter = userRepository.findByEmail(reporterEmail)
+        User reporter = userRepository.findByEmailIgnoreCase(reporterEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
 
         Signalement s = Signalement.builder()
@@ -57,7 +57,7 @@ public class SignalementService {
         Signalement s = signalementRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Signalement", id));
 
-        User resolver = userRepository.findByEmail(resolverEmail)
+        User resolver = userRepository.findByEmailIgnoreCase(resolverEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
 
         s.setResolved(true);

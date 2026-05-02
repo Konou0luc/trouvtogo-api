@@ -26,7 +26,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
             throw new IllegalArgumentException("Cet email est déjà utilisé");
         }
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -63,7 +63,7 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmailIgnoreCase(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Utilisateur introuvable"));
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
