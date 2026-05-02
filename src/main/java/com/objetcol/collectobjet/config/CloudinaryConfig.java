@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Cloudinary bean is created only when `cloudinary.api-key` is provided.
+ * Bean Cloudinary si la clé {@code cloudinary.api-key} est présente dans la configuration.
+ * Les valeurs peuvent être vides (variables d'environnement non définies) : la validation
+ * complète (cloud name, API key, secret) est faite dans {@link com.objetcol.collectobjet.service.ImageUploadService}.
  */
 @Configuration
 @ConditionalOnProperty(prefix = "cloudinary", name = "api-key", matchIfMissing = false)

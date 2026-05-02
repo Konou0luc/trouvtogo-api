@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,7 @@ public class UploadController {
     @PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Téléverser une ou plusieurs images (max 5)")
     public ResponseEntity<ApiResponse<Map<String, List<String>>>> uploadImages(
-            @RequestParam("files") MultipartFile[] files) throws IOException {
+            @RequestParam("files") MultipartFile[] files) {
         if (files != null && files.length > 5) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.error("Maximum 5 images par requête"));
