@@ -24,6 +24,8 @@ public class ObjetResponse {
     private TypeObjet type;
     private StatutObjet statut;
     private String localisation;
+    private Double latitude;
+    private Double longitude;
     private LocalDateTime dateEvenement;
     private String categorieNom;
     /** Libellé lisible (ex. description de la catégorie côté référentiel) */

@@ -51,6 +51,7 @@ public class ObjetService {
                 .build();
 
         appliquerConservationTrouve(objet, request);
+        appliquerGeo(objet, request);
 
         Objet saved = objetRepository.save(objet);
 
@@ -107,6 +108,7 @@ public class ObjetService {
         objet.setDateEvenement(request.getDateEvenement());
 
         appliquerConservationTrouve(objet, request);
+        appliquerGeo(objet, request);
 
         if (request.getCategorieId() != null) {
             Categorie categorie = categorieRepository.findById(request.getCategorieId())
@@ -184,6 +186,8 @@ public class ObjetService {
                 .type(objet.getType())
                 .statut(objet.getStatut())
                 .localisation(objet.getLocalisation())
+                .latitude(objet.getLatitude())
+                .longitude(objet.getLongitude())
                 .dateEvenement(objet.getDateEvenement())
                 .categorieId(objet.getCategorie() != null ? objet.getCategorie().getId() : null)
                 .categorieNom(objet.getCategorie() != null ? objet.getCategorie().getNom() : null)
@@ -236,5 +240,30 @@ public class ObjetService {
         }
         objet.setConservationTrouve(ConservationTrouvaille.DEPOSE_STRUCTURE);
         objet.setLieuDepot(lieu);
+    }
+
+    /** GPS facultatif, uniquement pour les annonces « trouvé » ; sinon effacé. */
+    private void appliquerGeo(Objet objet, ObjetRequest request) {
+        if (request.getType() != TypeObjet.TROUVE) {
+            objet.setLatitude(null);
+            objet.setLongitude(null);
+            return;
+        }
+        Double lat = request.getLatitude();
+        Double lng = request.getLongitude();
+        if (lat == null && lng == null) {
+            objet.setLatitude(null);
+            objet.setLongitude(null);
+            return;
+        }
+        if (lat == null || lng == null) {
+            throw new IllegalArgumentException(
+                    "Indiquez à la fois la latitude et la longitude, ou laissez les coordonnées vides.");
+        }
+        if (lat < -90.0 || lat > 90.0 || lng < -180.0 || lng > 180.0) {
+            throw new IllegalArgumentException("Coordonnées GPS hors plage valide.");
+        }
+        objet.setLatitude(lat);
+        objet.setLongitude(lng);
     }
 }

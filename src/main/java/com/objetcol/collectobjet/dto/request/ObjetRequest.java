@@ -32,5 +32,10 @@ public class ObjetRequest {
     /** Obligatoire si {@code conservationTrouve == DEPOSE_STRUCTURE}. */
     private Long lieuDepotId;
 
+    /** Point GPS de la découverte (avec {@code longitude}), facultatif. */
+    private Double latitude;
+
+    private Double longitude;
+
     private List<String> photosUrls;
 }

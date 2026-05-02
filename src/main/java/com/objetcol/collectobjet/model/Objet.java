@@ -34,6 +34,12 @@ public class Objet {
     @Column(length = 255)
     private String localisation;
 
+    /** Latitude WGS84 ; renseignée avec {@link #longitude} pour un point précis (ex. annonce « trouvé »). */
+    private Double latitude;
+
+    /** Longitude WGS84 */
+    private Double longitude;
+
     private LocalDateTime dateEvenement;
 
     /** Renseigné uniquement pour les annonces {@link TypeObjet#TROUVE} */
