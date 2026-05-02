@@ -41,6 +41,8 @@ public class SecurityConfig {
             "/api/auth/**",
             "/api/categories",
             "/api/categories/**",
+            "/api/lieux-depot",
+            "/api/lieux-depot/**",
             "/api/stats/**",
             "/api/objets",
             "/api/objets/{id}",

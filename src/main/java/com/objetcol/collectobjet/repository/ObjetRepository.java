@@ -82,4 +82,6 @@ public interface ObjetRepository extends JpaRepository<Objet, Long> {
 
     @Query("SELECT COUNT(DISTINCT o.proprietaire.id) FROM Objet o WHERE o.statut = :statut")
     long countDistinctProprietairesByStatut(@Param("statut") StatutObjet statut);
+
+    long countByLieuDepot_Id(Long lieuDepotId);
 }

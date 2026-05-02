@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -34,18 +35,21 @@ public class SignalementController {
     }
 
     @GetMapping("/api/admin/signalements")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lister tous les signalements (admin)", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponse<List<SignalementResponse>>> listAll() {
         return ResponseEntity.ok(ApiResponse.success("Signalements", signalementService.listAll()));
     }
 
     @GetMapping("/api/admin/signalements/non-resolus")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lister signalements non résolus (admin)", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponse<List<SignalementResponse>>> listUnresolved() {
         return ResponseEntity.ok(ApiResponse.success("Signalements non résolus", signalementService.listUnresolved()));
     }
 
     @PatchMapping("/api/admin/signalements/{id}/resolve")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Marquer un signalement comme résolu (admin)", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<ApiResponse<SignalementResponse>> resolve(
             @PathVariable Long id,

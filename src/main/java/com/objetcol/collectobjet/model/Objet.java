@@ -36,6 +36,15 @@ public class Objet {
 
     private LocalDateTime dateEvenement;
 
+    /** Renseigné uniquement pour les annonces {@link TypeObjet#TROUVE} */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "conservation_trouve")
+    private ConservationTrouvaille conservationTrouve;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "lieu_depot_id")
+    private LieuDepot lieuDepot;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categorie_id")
     private Categorie categorie;

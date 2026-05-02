@@ -6,6 +6,7 @@ import com.objetcol.collectobjet.exception.ResourceNotFoundException;
 import com.objetcol.collectobjet.exception.UnauthorizedException;
 import com.objetcol.collectobjet.model.*;
 import com.objetcol.collectobjet.repository.CategorieRepository;
+import com.objetcol.collectobjet.repository.LieuDepotRepository;
 import com.objetcol.collectobjet.repository.ObjetRepository;
 import com.objetcol.collectobjet.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class ObjetService {
     private final ObjetRepository objetRepository;
     private final UserRepository userRepository;
     private final CategorieRepository categorieRepository;
+    private final LieuDepotRepository lieuDepotRepository;
 
     @Transactional
     public ObjetResponse creerObjet(ObjetRequest request, String email) {
@@ -47,6 +49,8 @@ public class ObjetService {
                 .categorie(categorie)
                 .proprietaire(proprietaire)
                 .build();
+
+        appliquerConservationTrouve(objet, request);
 
         Objet saved = objetRepository.save(objet);
 
@@ -101,6 +105,8 @@ public class ObjetService {
         objet.setType(request.getType());
         objet.setLocalisation(request.getLocalisation());
         objet.setDateEvenement(request.getDateEvenement());
+
+        appliquerConservationTrouve(objet, request);
 
         if (request.getCategorieId() != null) {
             Categorie categorie = categorieRepository.findById(request.getCategorieId())
@@ -171,7 +177,7 @@ public class ObjetService {
                 ? objet.getPhotos().stream().map(Photo::getUrl).collect(Collectors.toList())
                 : List.of();
 
-        return ObjetResponse.builder()
+        ObjetResponse.ObjetResponseBuilder b = ObjetResponse.builder()
                 .id(objet.getId())
                 .titre(objet.getTitre())
                 .description(objet.getDescription())
@@ -187,6 +193,48 @@ public class ObjetService {
                 .photosUrls(photosUrls)
                 .createdAt(objet.getCreatedAt())
                 .updatedAt(objet.getUpdatedAt())
-                .build();
+                .conservationTrouve(objet.getConservationTrouve());
+
+        if (objet.getLieuDepot() != null) {
+            b.lieuDepotId(objet.getLieuDepot().getId())
+                    .lieuDepotTypeLieu(objet.getLieuDepot().getTypeLieu())
+                    .lieuDepotNom(objet.getLieuDepot().getNom())
+                    .lieuDepotAdresse(objet.getLieuDepot().getAdresse())
+                    .lieuDepotVille(objet.getLieuDepot().getVille())
+                    .lieuDepotTelephone(objet.getLieuDepot().getTelephone())
+                    .lieuDepotIndication(objet.getLieuDepot().getIndication());
+        }
+
+        return b.build();
+    }
+
+    /**
+     * Règles : uniquement pour {@link TypeObjet#TROUVE} ; sinon champs effacés.
+     */
+    private void appliquerConservationTrouve(Objet objet, ObjetRequest request) {
+        if (request.getType() != TypeObjet.TROUVE) {
+            objet.setConservationTrouve(null);
+            objet.setLieuDepot(null);
+            return;
+        }
+        if (request.getConservationTrouve() == null) {
+            throw new IllegalArgumentException(
+                    "Pour un objet trouvé, indiquez si vous le gardez chez vous ou si vous l’avez déposé dans un lieu référencé.");
+        }
+        if (request.getConservationTrouve() == ConservationTrouvaille.CHEZ_MOI) {
+            objet.setConservationTrouve(ConservationTrouvaille.CHEZ_MOI);
+            objet.setLieuDepot(null);
+            return;
+        }
+        if (request.getLieuDepotId() == null) {
+            throw new IllegalArgumentException("Sélectionnez un lieu de dépôt pour indiquer où l’objet a été déposé.");
+        }
+        LieuDepot lieu = lieuDepotRepository.findById(request.getLieuDepotId())
+                .orElseThrow(() -> new ResourceNotFoundException("Lieu de dépôt", request.getLieuDepotId()));
+        if (!lieu.isActif()) {
+            throw new IllegalArgumentException("Ce lieu de dépôt n’est plus proposé ; choisissez un autre lieu.");
+        }
+        objet.setConservationTrouve(ConservationTrouvaille.DEPOSE_STRUCTURE);
+        objet.setLieuDepot(lieu);
     }
 }

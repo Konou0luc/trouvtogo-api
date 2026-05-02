@@ -1,6 +1,8 @@
 package com.objetcol.collectobjet.dto.response;
 
+import com.objetcol.collectobjet.model.ConservationTrouvaille;
 import com.objetcol.collectobjet.model.StatutObjet;
+import com.objetcol.collectobjet.model.TypeLieuDepot;
 import com.objetcol.collectobjet.model.TypeObjet;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,4 +34,14 @@ public class ObjetResponse {
     private List<String> photosUrls;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    /** Renseigné uniquement pour les annonces « trouvé ». */
+    private ConservationTrouvaille conservationTrouve;
+    private Long lieuDepotId;
+    private TypeLieuDepot lieuDepotTypeLieu;
+    private String lieuDepotNom;
+    private String lieuDepotAdresse;
+    private String lieuDepotVille;
+    private String lieuDepotTelephone;
+    private String lieuDepotIndication;
 }
