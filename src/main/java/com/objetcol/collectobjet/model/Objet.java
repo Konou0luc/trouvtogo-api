@@ -29,6 +29,7 @@ public class Objet {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private StatutObjet statut = StatutObjet.ACTIF;
 
     @Column(length = 255)
@@ -41,6 +42,11 @@ public class Objet {
     private Double longitude;
 
     private LocalDateTime dateEvenement;
+
+    /**
+     * Montant de remise en FCFA proposé au retrouveur (annonces {@link TypeObjet#PERDU} uniquement).
+     */
+    private Long remiseMontant;
 
     /** Renseigné uniquement pour les annonces {@link TypeObjet#TROUVE} */
     @Enumerated(EnumType.STRING)

@@ -19,6 +19,7 @@ public class Message {
     private String contenu;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean lu = false;
 
     @ManyToOne(fetch = FetchType.LAZY)

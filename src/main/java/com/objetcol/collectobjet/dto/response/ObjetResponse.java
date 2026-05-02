@@ -46,4 +46,7 @@ public class ObjetResponse {
     private String lieuDepotVille;
     private String lieuDepotTelephone;
     private String lieuDepotIndication;
+
+    /** Montant de remise (FCFA), uniquement pour les annonces « perdu ». */
+    private Long remiseMontant;
 }

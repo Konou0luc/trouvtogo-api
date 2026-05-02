@@ -19,6 +19,7 @@ public class Notification {
     private String message;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean lue = false;
 
     @Column(length = 50)

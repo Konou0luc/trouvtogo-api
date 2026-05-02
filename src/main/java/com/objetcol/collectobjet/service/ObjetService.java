@@ -52,6 +52,7 @@ public class ObjetService {
 
         appliquerConservationTrouve(objet, request);
         appliquerGeo(objet, request);
+        appliquerRemise(objet, request);
 
         Objet saved = objetRepository.save(objet);
 
@@ -109,6 +110,7 @@ public class ObjetService {
 
         appliquerConservationTrouve(objet, request);
         appliquerGeo(objet, request);
+        appliquerRemise(objet, request);
 
         if (request.getCategorieId() != null) {
             Categorie categorie = categorieRepository.findById(request.getCategorieId())
@@ -197,7 +199,8 @@ public class ObjetService {
                 .photosUrls(photosUrls)
                 .createdAt(objet.getCreatedAt())
                 .updatedAt(objet.getUpdatedAt())
-                .conservationTrouve(objet.getConservationTrouve());
+                .conservationTrouve(objet.getConservationTrouve())
+                .remiseMontant(objet.getRemiseMontant());
 
         if (objet.getLieuDepot() != null) {
             b.lieuDepotId(objet.getLieuDepot().getId())
@@ -265,5 +268,24 @@ public class ObjetService {
         }
         objet.setLatitude(lat);
         objet.setLongitude(lng);
+    }
+
+    /**
+     * Remise réservée aux annonces « perdu » ; ignorée pour « trouvé ».
+     */
+    private void appliquerRemise(Objet objet, ObjetRequest request) {
+        if (request.getType() != TypeObjet.PERDU) {
+            objet.setRemiseMontant(null);
+            return;
+        }
+        Long r = request.getRemiseMontant();
+        if (r == null || r <= 0) {
+            objet.setRemiseMontant(null);
+            return;
+        }
+        if (r > 1_000_000_000L) {
+            throw new IllegalArgumentException("Montant de remise trop élevé.");
+        }
+        objet.setRemiseMontant(r);
     }
 }

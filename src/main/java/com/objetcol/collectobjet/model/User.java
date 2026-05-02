@@ -30,9 +30,11 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private Role role = Role.ROLE_USER;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean actif = true;
 
     @CreationTimestamp

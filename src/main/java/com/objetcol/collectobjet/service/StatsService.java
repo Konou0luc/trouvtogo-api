@@ -47,14 +47,15 @@ public class StatsService {
                 ") r ON date_trunc('month', m.month_start) = r.month " +
                 "ORDER BY m.month_start;";
 
-        return jdbcTemplate.query(sql, new Object[]{months}, (rs, rowNum) ->
-                TimeSeriesPointResponse.builder()
+        return jdbcTemplate.query(
+                sql,
+                (rs, rowNum) -> TimeSeriesPointResponse.builder()
                         .key(rs.getString("key"))
                         .name(rs.getString("name"))
                         .lost(rs.getLong("lost"))
                         .found(rs.getLong("found"))
                         .resolved(rs.getLong("resolved"))
-                        .build()
-        );
+                        .build(),
+                months);
     }
 }

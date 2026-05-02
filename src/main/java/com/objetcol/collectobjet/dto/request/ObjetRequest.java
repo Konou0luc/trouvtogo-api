@@ -38,4 +38,9 @@ public class ObjetRequest {
     private Double longitude;
 
     private List<String> photosUrls;
+
+    /**
+     * Optionnel : montant en FCFA pour le retrouveur, uniquement si {@code type == PERDU}.
+     */
+    private Long remiseMontant;
 }

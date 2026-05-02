@@ -26,6 +26,7 @@ public class Signalement {
     @Column(columnDefinition = "text")
     private String message;
 
+    @Builder.Default
     private boolean resolved = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
